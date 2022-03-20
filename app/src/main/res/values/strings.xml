@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">동식이</string>
+    <string name="title_home">오늘의 학식</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="title_tomorrow">내일의 학식</string>
+    <string name="app_widget_description">학식 메뉴</string>
+</resources>
