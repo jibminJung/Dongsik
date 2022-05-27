@@ -2,12 +2,12 @@ package com.jimmy.dongsik.ui.widget
 
 import android.util.Log
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.glance.*
+import androidx.glance.action.actionStartActivity
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.action.actionRunCallback
@@ -19,8 +19,8 @@ import androidx.glance.state.PreferencesGlanceStateDefinition
 import androidx.glance.text.Text
 import androidx.glance.text.TextAlign
 import androidx.glance.text.TextStyle
-import androidx.glance.unit.ColorProvider
 import com.google.gson.Gson
+import com.jimmy.dongsik.MainActivity
 import com.jimmy.dongsik.R
 import com.jimmy.dongsik.model.Name
 import com.jimmy.dongsik.model.Restaurant
@@ -38,12 +38,11 @@ class DongsikGlanceWidget : GlanceAppWidget() {
         val restaurants = mutableListOf<Restaurant?>()
         val date = prefs[DongsikGlanceReceiver.DATE]
         Name.values().forEach {
-            restaurants.add(
-                gson.fromJson(
-                    prefs[stringPreferencesKey(it.toString())],
-                    Restaurant::class.java
+            prefs[stringPreferencesKey(it.toString())]?.let {
+                restaurants.add(
+                    gson.fromJson(it, Restaurant::class.java)
                 )
-            )
+            }
         }
         MyWidget(restaurants = restaurants, date ?: "오늘의 학식")
     }
@@ -61,14 +60,15 @@ fun MyWidget(restaurants: List<Restaurant?>, date: String) {
             )
             Image(
                 ImageProvider(R.drawable.ic_baseline_refresh_24),
-                contentDescription = "Refresh"
+                contentDescription = "Refresh",
+                modifier = GlanceModifier.clickable(actionRunCallback(MenuRefreshCallback::class.java))
             )
 
         }
         LazyColumn(modifier = GlanceModifier.background(ImageProvider(R.drawable.rounded_widget_bg))) {
             items(restaurants) { item ->
                 item?.let {
-                    RestaurantCard(restaurant = item)
+                    GlanceRestaurantCard(restaurant = item)
                 } ?: kotlin.run {
                     Log.d("DongsikGlanceWidget", "MyWidget: null")
                 }
@@ -79,8 +79,12 @@ fun MyWidget(restaurants: List<Restaurant?>, date: String) {
 }
 
 @Composable
-fun RestaurantCard(restaurant: Restaurant) {
-    Box() {
+fun GlanceRestaurantCard(restaurant: Restaurant) {
+    Box(
+        modifier = GlanceModifier.clickable(
+            actionStartActivity(MainActivity::class.java)
+        )
+    ) {
         Column(
             modifier = GlanceModifier
                 .padding(12.dp)

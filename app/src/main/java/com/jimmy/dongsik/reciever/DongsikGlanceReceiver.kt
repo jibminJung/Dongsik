@@ -60,13 +60,13 @@ class DongsikGlanceReceiver : GlanceAppWidgetReceiver() {
             if (document != null) {
                 Log.d(TAG, "DocumentSnapshot data: ${document.data}")
                 val arr = ArrayList<Restaurant>()
-                for (cafeteria in document.data!!) {
+                document.data?.forEach { key, data ->
                     arr.add(
                         Restaurant(
-                            name = Name.valueOf(cafeteria.key),
-                            breakfast = (cafeteria.value as Map<String, List<String>>).get("breakfast"),
-                            lunch = (cafeteria.value as Map<String, List<String>>).get("lunch"),
-                            dinner = (cafeteria.value as Map<String, List<String>>).get("dinner")
+                            name = Name.valueOf(key),
+                            breakfast = (data as Map<String, List<String>>).get("breakfast"),
+                            lunch = (data as Map<String, List<String>>).get("lunch"),
+                            dinner = (data as Map<String, List<String>>).get("dinner")
                         )
                     )
                 }
